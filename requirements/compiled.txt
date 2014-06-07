@@ -4,3 +4,6 @@
 
 # for bcrypt passwords
 bcrypt
+
+#images support
+Pillow

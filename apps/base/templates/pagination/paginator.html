@@ -1,0 +1,16 @@
+{% if is_paginated %}
+<div class="pagination">
+    <ul>
+    {% for linkpage in paginator.page_range %}
+        <li>
+        {% ifequal linkpage page_obj.number %}
+            <span class="active">{{ page_obj.number }}</span>
+        {% else %}
+            <a href="{% ifequal linkpage 1 %}{% if query_string %}?{{ query_string }}{% else %}{{ request.path }}{% endif %}{% else %}?page={{ linkpage }}{% if query_string %}&{{ query_string }}{% endif %}{% endifequal %}">{{ linkpage }}</a>
+        {% endifequal %}
+        </li>
+    {% endfor %}
+    </ul>
+    <span class="up">Наверх</span>
+</div><!-- END pagination -->
+{% endif %}

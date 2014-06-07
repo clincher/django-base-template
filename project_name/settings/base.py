@@ -5,6 +5,7 @@ repo. If you need to override a setting locally, use local.py
 
 import os
 import logging
+from os.path import abspath, basename, dirname, join, normpath
 
 # Normally you should not import ANYTHING from Django directly
 # into your settings, but ImproperlyConfigured is an exception.
@@ -19,15 +20,20 @@ def get_env_setting(setting):
         error_msg = "Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)
 
+SITE_ID = 1
 
 # Your project root
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
+PROJECT_ROOT = abspath(dirname(__file__) + "../../../")
 
 SUPPORTED_NONLOCALES = ['media', 'admin', 'static']
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
+
+LANGUAGES = (
+    ('ru', 'Russian'),
+)
 
 # Defines the views served for root URLs.
 ROOT_URLCONF = '{{ project_name }}.urls'
@@ -36,24 +42,47 @@ ROOT_URLCONF = '{{ project_name }}.urls'
 INSTALLED_APPS = (
     # Django contrib apps
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'grappelli', #before admin
+    # 'djangocms_admin_style', #before admin for django-cms
     'django.contrib.admin',
     'django.contrib.humanize',
     'django.contrib.syndication',
     'django.contrib.staticfiles',
+    'django.contrib.comments',
 
     # Third-party apps, patches, fixes
-    'djcelery',
+    # 'djcelery',
+    'ckeditor',
+    'sorl.thumbnails',
+    'mptt',
+    'django_comments_xtd',
+    # django-cms support
+    # 'djangocms_text_ckeditor',
+    # 'cms',  # django CMS itself
+    # 'sekizai',
+    # 'filer',
+    # 'cmsplugin_filer_file',
+    # 'cmsplugin_filer_image',
+    # 'cmsplugin_filer_folder',
+    # 'cmsplugin_filer_link',
+    # 'cmsplugin_filer_teaser',
+    # 'cmsplugin_filer_video',
+    # 'djangocms_admin_style',
+
     'debug_toolbar',
     'compressor',
+    'django_extensions',
 
     # Database migrations
     'south',
 
     # Application base, containing global templates.
     'base',
+    'users',
 
     # Local apps, referenced via appname
 )
@@ -80,7 +109,7 @@ SESSION_COOKIE_SECURE = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.example.com/media/"
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_ROOT = normpath(join(PROJECT_ROOT, 'media'))
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -91,7 +120,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.example.com/static/"
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_ROOT = normpath(join(PROJECT_ROOT, 'static'))
 
 # URL prefix for static files.
 # Example: "http://media.example.com/static/"
@@ -103,6 +132,16 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+CKEDITOR_UPLOAD_PATH = 'ckeditor/'
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Full',
+        'height': 700,
+        'width': 900,
+    },
+}
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -120,7 +159,7 @@ USE_TZ = True
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Los_Angeles'
+TIME_ZONE = 'Europe/Russia'
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -137,6 +176,10 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    # 'cms.middleware.page.CurrentPageMiddleware',
+    # 'cms.middleware.user.CurrentUserMiddleware',
+    # 'cms.middleware.toolbar.ToolbarMiddleware',
+    # 'cms.middleware.language.LanguageCookieMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
@@ -151,6 +194,9 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     'django.core.context_processors.csrf',
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
+    # 'cms.context_processors.cms_settings',
+    # 'sekizai.context_processors.sekizai',
+    'apps.base.context_processors.paginator_context',
 ]
 
 TEMPLATE_DIRS = (
@@ -167,6 +213,9 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 
+CMS_TEMPLATES = (
+    ('cms_template.html', 'Common CMS Template'),
+)
 
 def custom_show_toolbar(request):
     """ Only show the debug toolbar to users with the superuser flag. """
@@ -182,21 +231,8 @@ DEBUG_TOOLBAR_CONFIG = {
     'ENABLE_STACKTRACES': True,
 }
 
-# DEBUG_TOOLBAR_PANELS = (
-#     #'debug_toolbar_user_panel.panels.UserPanel',
-#     'debug_toolbar.panels.version.VersionDebugPanel',
-#     'debug_toolbar.panels.timer.TimerDebugPanel',
-#     'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-#     'debug_toolbar.panels.headers.HeaderDebugPanel',
-#     'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-#     'debug_toolbar.panels.template.TemplateDebugPanel',
-#     'debug_toolbar.panels.sql.SQLDebugPanel',
-#     'debug_toolbar.panels.signals.SignalDebugPanel',
-#     'debug_toolbar.panels.logger.LoggingPanel',
-# )
-
 # Specify a custom user model to use
-#AUTH_USER_MODEL = 'accounts.MyUser'
+AUTH_USER_MODEL = 'users.User'
 
 FILE_UPLOAD_PERMISSIONS = 0o0664
 
@@ -206,8 +242,8 @@ WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 # Define your database connections
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.',
-        'NAME': '',
+        'ENGINE': 'django.db.backends.sqlite',
+        'NAME': 'db/{{ project_name }}.sqlite',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -237,7 +273,7 @@ MANAGERS = ADMINS
 # SECURITY WARNING: don't run with debug turned on in production!
 # Debugging displays nice error messages, but leaks memory. Set this to False
 # on all server instances and True only for development.
-DEBUG = TEMPLATE_DEBUG = False
+DEBUG = TEMPLATE_DEBUG = True
 
 # Is this a development instance? Set this to True on development/master
 # instances and False on stage/prod.
@@ -266,10 +302,19 @@ ALLOWED_HOSTS = []
 INTERNAL_IPS = ('127.0.0.1')
 
 # Enable this option for memcached
-#CACHE_BACKEND= "memcached://127.0.0.1:11211/"
 
-# Set this to true if you use a proxy that sets X-Forwarded-Host
-#USE_X_FORWARDED_HOST = False
+CACHES = {
+    'default': {
+        'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
+        'LOCATION': 'localhost:11211',
+        'TIMEOUT': 500,
+        'BINARY': True,
+        'OPTIONS': {  # Maps to pylibmc "behaviors"
+            'tcp_nodelay': True,
+            'ketama': True
+        }
+    }
+}
 
 SERVER_EMAIL = "webmaster@example.com"
 DEFAULT_FROM_EMAIL = "webmaster@example.com"
@@ -296,3 +341,11 @@ LOGGING = {
 #CEF_VENDOR = 'Your Company'
 #CEF_VERSION = '0'
 #CEF_DEVICE_VERSION = '0'
+
+#COMMENTS SETTINGS
+COMMENTS_XTD_MAX_THREAD_LEVEL = 2
+
+# SOUTH_MIGRATION_MODULES = {
+#     'easy_thumbnails': 'easy_thumbnails.south_migrations',
+# }
+
