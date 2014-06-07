@@ -38,8 +38,8 @@ def do_rating_by_request(parser, token):
     context variable will be 0.
     
     Example usage::
-    
-        {% rating_by_request request on instance as vote %}
+
+        {\% request on instance as vote %}
     """
     
     bits = token.contents.split()
@@ -74,8 +74,8 @@ def do_rating_by_user(parser, token):
     context variable will be 0.
     
     Example usage::
-    
-        {% rating_by_user user on instance as vote %}
+
+        {\% rating_by_user user on instance as vote %}
     """
     
     bits = token.contents.split()
