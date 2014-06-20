@@ -14,8 +14,10 @@ class CustomUserObjectMixin(SingleObjectMixin):
     """
     model = get_user_model()
 
-    def get_object(self):
-        """Return's the current users profile."""
+    def get_object(self, queryset=None):
+        """
+        Returns the current users profile.
+        """
         try:
             return self.request.user
         except self.model.DoesNotExist:
@@ -29,8 +31,9 @@ class CustomUserObjectMixin(SingleObjectMixin):
         return super(klass, self).dispatch(request, *args, **kwargs)
 
 
-class UserUpdateView(
-    CustomUserObjectMixin, SuccessURLRedirectListMixin, UpdateView):
+class UserUpdateView(CustomUserObjectMixin,
+                     SuccessURLRedirectListMixin,
+                     UpdateView):
     """
     A view that displays a form for editing a user's profile.
 
