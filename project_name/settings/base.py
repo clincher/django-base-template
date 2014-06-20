@@ -225,7 +225,7 @@ def custom_show_toolbar(request):
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': 'bazo.settings.base.custom_show_toolbar',
+    'SHOW_TOOLBAR_CALLBACK': '{{ project_name }}.settings.base.custom_show_toolbar',
     'SHOW_TEMPLATE_CONTEXT': True,
     'ENABLE_STACKTRACES': True,
 }
