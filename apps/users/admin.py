@@ -2,8 +2,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from apps.users.models import User
-from forms import AdminUserChangeForm, AdminUserCreationForm
+from .models import User
+from .forms import AdminUserChangeForm, AdminUserCreationForm
 
 
 class CustomUserAdmin(UserAdmin):
@@ -16,24 +16,24 @@ class CustomUserAdmin(UserAdmin):
     # that reference specific fields on auth.User.
     list_display = ('email', 'get_full_name')
     list_filter = ('is_superuser',)
-    # fieldsets = (
-    #     ('', {
-    #         'fields': ('first_name', 'last_name', 'gender',
-    #                    'pastimes', 'url'),
-    #     }),
-    #     ('Permissions', {
-    #         'classes': ('grp-collapse grp-closed',),
-    #         'fields': ('is_superuser', 'is_active', 'is_staff', 'groups'),
-    #     }),
-    #     ('Important dates', {
-    #         'classes': ('grp-collapse grp-closed',),
-    #         'fields': ('last_login',),
-    #     }),
-    #     ('Other', {
-    #         'classes': ('grp-collapse grp-closed',),
-    #         'fields': ('email', 'password'),
-    #     })
-    # )
+    fieldsets = (
+        ('', {
+            'fields': ('first_name', 'last_name'),
+        }),
+        ('Permissions', {
+            'classes': ('grp-collapse grp-closed',),
+            'fields': ('is_superuser', 'is_active', 'is_staff', 'groups'),
+        }),
+        ('Important dates', {
+            'classes': ('grp-collapse grp-closed',),
+            'fields': ('last_login',),
+        }),
+        ('Other', {
+            'classes': ('grp-collapse grp-closed',),
+            'fields': ('email', 'password'),
+        })
+    )
+
     add_fieldsets = (
         (None, {
             'fields': ('email', 'first_name', 'last_name',

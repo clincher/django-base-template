@@ -11,7 +11,7 @@ if not settings.configured:
         INSTALLED_APPS=[
             'django.contrib.auth',
             'django.contrib.contenttypes',
-            'apps.djangoratings',
+            'apps.ratings',
         ]
     )
 
@@ -20,7 +20,7 @@ from django.test.simple import run_tests
 
 def runtests(*test_args):
     if not test_args:
-        test_args = ['djangoratings']
+        test_args = ['ratings']
     parent = dirname(abspath(__file__))
     sys.path.insert(0, parent)
     failures = run_tests(test_args, verbosity=1, interactive=True)

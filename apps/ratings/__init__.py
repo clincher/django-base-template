@@ -30,7 +30,7 @@ __build__ = get_revision()
 def lazy_object(location):
     def inner(*args, **kwargs):
         parts = location.rsplit('.', 1)
-        warnings.warn('`djangoratings.%s` is deprecated. Please use `%s` instead.' % (parts[1], location), DeprecationWarning)
+        warnings.warn('`ratings.%s` is deprecated. Please use `%s` instead.' % (parts[1], location), DeprecationWarning)
         try:
             imp = __import__(parts[0], globals(), locals(), [parts[1]], -1)
         except:
@@ -41,6 +41,6 @@ def lazy_object(location):
         return func
     return inner
 
-RatingField = lazy_object('apps.djangoratings.fields.RatingField')
-AnonymousRatingField = lazy_object('apps.djangoratings.fields.AnonymousRatingField')
-Rating = lazy_object('apps.djangoratings.fields.Rating')
+RatingField = lazy_object('apps.ratings.fields.RatingField')
+AnonymousRatingField = lazy_object('apps.ratings.fields.AnonymousRatingField')
+Rating = lazy_object('apps.ratings.fields.Rating')

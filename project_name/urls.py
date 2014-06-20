@@ -14,8 +14,8 @@ def bad(request):
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'', include('base.urls')),
-    url(r'^comments/', include('django_comments_xtd.urls')),
+    url(r'', include('apps.base.urls')),
+    # url(r'^comments/', include('django_comments_xtd.urls')),
     (r'^ckeditor/', include('ckeditor.urls')),
 
     url(r'^admin/', include(admin.site.urls)),

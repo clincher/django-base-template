@@ -1,4 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -9,7 +11,7 @@ from apps.users.managers import EmailUserManager
 class User(AbstractBaseUser, PermissionsMixin):
     """
     Custom user class. We can change first_name and last_name fields to one
-    and add as much fealds as needed
+    and add as much fields as needed
     """
 
     first_name = models.CharField(_('first name'), max_length=30, blank=True)

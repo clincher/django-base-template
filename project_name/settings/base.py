@@ -4,7 +4,7 @@ repo. If you need to override a setting locally, use local.py
 """
 
 import os
-import logging
+import logging.config
 from os.path import abspath, basename, dirname, join, normpath
 
 # Normally you should not import ANYTHING from Django directly
@@ -57,7 +57,7 @@ INSTALLED_APPS = (
     # Third-party apps, patches, fixes
     # 'djcelery',
     'ckeditor',
-    'sorl.thumbnails',
+    'sorl.thumbnail',
     'mptt',
     'django_comments_xtd',
     # django-cms support
@@ -81,8 +81,8 @@ INSTALLED_APPS = (
     'south',
 
     # Application base, containing global templates.
-    'base',
-    'users',
+    'apps.base',
+    'apps.users',
 
     # Local apps, referenced via appname
 )
@@ -159,7 +159,7 @@ USE_TZ = True
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'Europe/Russia'
+TIME_ZONE = 'Europe/Moscow'
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -217,16 +217,15 @@ CMS_TEMPLATES = (
     ('cms_template.html', 'Common CMS Template'),
 )
 
+
 def custom_show_toolbar(request):
     """ Only show the debug toolbar to users with the superuser flag. """
     return request.user.is_superuser
 
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False,
-    'SHOW_TOOLBAR_CALLBACK': '{{ project_name }}.settings.base.custom_show_toolbar',
-    'HIDE_DJANGO_SQL': True,
-    'TAG': 'body',
+    'SHOW_TOOLBAR_CALLBACK': 'bazo.settings.base.custom_show_toolbar',
     'SHOW_TEMPLATE_CONTEXT': True,
     'ENABLE_STACKTRACES': True,
 }
@@ -242,7 +241,7 @@ WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
 # Define your database connections
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'db/{{ project_name }}.sqlite',
         'USER': '',
         'PASSWORD': '',
@@ -327,14 +326,56 @@ HAS_SYSLOG = True
 SYSLOG_TAG = "http_app_{{ project_name }}"  # Make this unique to your project.
 # Remove this configuration variable to use your custom logging configuration
 LOGGING_CONFIG = None
+
 LOGGING = {
     'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d '
+                      '%(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
+        },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+        'errors': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(PROJECT_ROOT, 'logs/error.log'),
+            'formatter': 'verbose'
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
     'loggers': {
-        '{{ project_name }}': {
-            'level': "DEBUG"
-        }
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        '': {
+            'handlers': ['errors', 'console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
     }
 }
+logging.config.dictConfig(LOGGING)
 
 # Common Event Format logging parameters
 #CEF_PRODUCT = '{{ project_name }}'

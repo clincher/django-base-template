@@ -8,8 +8,8 @@ django-model-utils
 django-comments-xtd
 django-grappelli
 django-ckeditor-updated
-sorl-thumbnail
-mptt
+-e git+https://github.com/mariocesar/sorl-thumbnail.git@v11.12.1b#egg=sorl-thumbnail
+django-mptt
 
 
 #django-cms
@@ -21,6 +21,7 @@ mptt
 #easy-thumbnails
 
 # Templates
+django-appconf
 django_compressor
 
 # Security
@@ -39,7 +40,8 @@ django_compressor
 #-e git://github.com/clouserw/tower.git#egg=tower
 
 # Caching
-pylibmc
+django-pylibmc
+-e git+https://github.com/lericson/pylibmc.git@py3k#egg=pylibmc
 
 # Admin
 django-extensions

@@ -38,8 +38,9 @@ def do_rating_by_request(parser, token):
     context variable will be 0.
     
     Example usage::
-
-        {\% request on instance as vote %}
+    
+        {% request on instance as vote %}
+    
     """
     
     bits = token.contents.split()
@@ -55,13 +56,13 @@ register.tag('rating_by_request', do_rating_by_request)
 class RatingByUserNode(RatingByRequestNode):
     def render(self, context):
         try:
-            user = template.resolve_variable(self.request, context)
+            request = template.resolve_variable(self.request, context)
             obj = template.resolve_variable(self.obj, context)
             field = getattr(obj, self.field_name)
         except template.VariableDoesNotExist:
             return ''
         try:
-            vote = field.get_rating_for_user(user)
+            vote = field.get_rating_for_user(request.user)
             context[self.context_var] = vote
         except ObjectDoesNotExist:
             context[self.context_var] = 0
@@ -75,7 +76,9 @@ def do_rating_by_user(parser, token):
     
     Example usage::
 
-        {\% rating_by_user user on instance as vote %}
+    
+        {% rating_by_user user on instance as vote %}
+    
     """
     
     bits = token.contents.split()
