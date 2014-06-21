@@ -1,0 +1,24 @@
+{% load comments i18n %}
+<form action="{% comment_form_target %}" class="comment_form" method="post">
+  <h6>Комментарии ({% get_comment_count for object as comment_count %}{{ comment_count }})</h6>
+  {% csrf_token %}
+    {% for error in form.errors %}
+        {{ error }}
+    {% endfor %}
+    <p style="display:none;">{{ form.honeypot }}</p>
+  {% for field in form %}
+    {% if field.is_hidden %}
+      {{ field }}
+    {% endif %}
+  {% endfor %}
+  <input type="hidden" name="next" value="{% if comment %}{{ comment.get_absolute_url }}{% else %}{{ request.path }}#comments{% endif %}" />
+  <label class="checkbox" for="id_followup"><input id="id_followup" type="text" name="followup" />Получать комментарии к этой новости по email</label>
+  <div class="avatar">
+    <img src="{{ STATIC_URL }}images/img14.png" width="46" height="46" />
+    <p>символов <span>999</span></p>
+  </div><!-- END avatar -->
+  <textarea placeholder="Максимальная длина комментария - 999 символов" maxlength="999" name="comment"></textarea>
+  <input type="text" class="input_name" placeholder="Имя" name="name" />
+  <input type="text" class="input_name" placeholder="email" name="email" />
+  <input type="submit" class="send" value="Добавить комментарий" />
+</form><!-- END comm_form -->

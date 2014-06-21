@@ -1,5 +1,10 @@
 {% if is_paginated %}
 <div class="pagination">
+  {% if page_obj.has_previous %}
+    <a href="{% ifequal page_obj.previous_page_number 1 %}{% if query_string %}?{{ query_string }}{% else %}{{ request.path }}{% endif %}{% else %}?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}{% endifequal %}" class="pag_prev"><span>Назад</span></a>
+  {% else %}
+    <span class="pag_prev"><span>Назад</span></span>
+  {% endif %}
     <ul>
     {% for linkpage in paginator.page_range %}
         <li>
@@ -11,6 +16,11 @@
         </li>
     {% endfor %}
     </ul>
-    <span class="up">Наверх</span>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}" class="pag_next"><span>Далее</span></a>
+  {% else %}
+  <span class="pag_next"><span>Далее</span></span>
+  {% endif %}
+
 </div><!-- END pagination -->
 {% endif %}

@@ -83,6 +83,7 @@ INSTALLED_APPS = (
     # Application base, containing global templates.
     'apps.base',
     'apps.users',
+    'apps.utils',
 
     # Local apps, referenced via appname
 )
@@ -134,15 +135,34 @@ STATICFILES_DIRS = (
 )
 
 CKEDITOR_UPLOAD_PATH = 'ckeditor/'
-
 CKEDITOR_CONFIGS = {
     'default': {
+        'skin': 'moono',
+        'toolbar_Basic': [
+            ['Source', '-', 'Bold', 'Italic']
+        ],
+        'toolbar_Full': [
+            ['Styles', 'Format', 'Bold', 'Italic', 'Strike', 'Undo', 'Redo'],
+            ['Link', 'Image', 'Flash', 'Table', 'HorizontalRule'],
+            ['BulletedList'],
+            ['TextColor', 'BGColor', 'Paste', 'PasteFromWord'],
+            ['Smiley', 'SpecialChar'], ['Source'],
+        ],
         'toolbar': 'Full',
         'height': 700,
         'width': 900,
     },
+    'simple': {
+        'skin': 'moono',
+        'toolbar_Basic': [
+            ['Styles', 'Format', 'Bold', 'Italic', 'Strike'],
+            ['Source']
+        ],
+        'toolbar': 'Basic',
+        'height': 70,
+        'width': 400,
+    },
 }
-
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
@@ -377,16 +397,14 @@ LOGGING = {
 }
 logging.config.dictConfig(LOGGING)
 
-# Common Event Format logging parameters
-#CEF_PRODUCT = '{{ project_name }}'
-#CEF_VENDOR = 'Your Company'
-#CEF_VERSION = '0'
-#CEF_DEVICE_VERSION = '0'
-
 #COMMENTS SETTINGS
-COMMENTS_XTD_MAX_THREAD_LEVEL = 2
+COMMENTS_APP = "django_comments_xtd"
+COMMENTS_XTD_CONFIRM_EMAIL = False
+COMMENTS_XTD_THREADED_EMAILS = False
+COMMENTS_XTD_MAX_THREAD_LEVEL = 0
+COMMENTS_XTD_MODEL = 'apps.base.models.RatedComment'
+COMMENTS_XTD_FORM_CLASS = 'django_comments_xtd.forms.XtdCommentForm'
 
 # SOUTH_MIGRATION_MODULES = {
 #     'easy_thumbnails': 'easy_thumbnails.south_migrations',
 # }
-

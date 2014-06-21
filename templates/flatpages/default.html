@@ -1,0 +1,6 @@
+{% extends 'site_base.html' %}
+
+{% block body_base %}
+<p class="breadcrumbs"><a href="{% url 'home' %}">Главная</a> {{ flatpage.title }}</p>
+<div>{{ flatpage.content }}</div>
+{% endblock %}

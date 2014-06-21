@@ -1,0 +1,19 @@
+{% load comments static %}
+{% for comment in comment_list %}
+  <div id="c{{ comment.pk }}"  class="comment_block" itemscope itemtype="http://schema.org/UserComments">
+    <div class="avatar">
+      <img src="{{ STATIC_URL }}images/img14.png" width="46" height="46" />
+    </div><!-- END avatar -->
+    <div class="comment_content" itemprop="commentText">
+      <span class="comm_info"><strong itemprop="creator">{{ comment.name }}</strong><em itemprop="commentTime">{{ comment.submit_date|date:"j.E.Y в G:i" }}{# 17 часов назад #}</em></span>
+      <p>{{ comment.comment|linebreaksbr }}</p>
+    </div>
+    <div class="rate">
+      <span>{% if comment.rating.score > 0 %}+{% endif %}{{ comment.rating.score }}</span>
+      <a data-href="{% url 'comment-rating' comment.pk 1 %}" class="plus ajax-vote"></a>
+      <a data-href="{% url 'comment-rating' comment.pk -1 %}" class="minus ajax-vote"></a>
+    </div><!-- END rate -->
+  </div><!-- END comment_block -->
+{% empty %}
+    <p>Комментариев пока нет. Станьте первым!</p>
+  {% endfor %}

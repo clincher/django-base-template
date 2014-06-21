@@ -1,33 +1,14 @@
-from django.db.models import IntegerField, PositiveIntegerField, Sum, Count
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.forms.fields import ChoiceField
+from hashlib import md5
 
-from datetime import datetime
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import FloatField, PositiveIntegerField, Sum, Count
+from django.conf import settings
+from django.forms.fields import ChoiceField
+from django.utils.timezone import now
 
 from .exceptions import *
 
-if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:
-    raise ImportError("ratings requires django.contrib.contenttypes "
-                      "in your INSTALLED_APPS")
-
-from django.contrib.contenttypes.models import ContentType
-
 __all__ = ('Rating', 'RatingField', 'AnonymousRatingField')
-
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import new as md5
-
-try:
-    from django.utils.timezone import now
-except ImportError:
-    now = datetime.now
-
-
-def md5_hexdigest(value):
-    return md5(value).hexdigest()
 
 
 class Rating(object):
@@ -47,6 +28,7 @@ class RatingManager(object):
         )
         self.votes_field_name = "%s_votes" % (self.field.name,)
         self.score_field_name = "%s_score" % (self.field.name,)
+        self.rating_field_name = "%s_rating" % (self.field.name,)
         self.use_cookies = self.field.allow_anonymous and self.field.use_cookies
         if self.use_cookies:
             cookie_format = 'vote-{content_type.pk}.{object_id}.{key:<6}'
@@ -59,14 +41,9 @@ class RatingManager(object):
         from .models import Vote
 
         return Vote.objects.filter(**self.default_kwargs)
-        
-    def get_rating(self):
-        """get_rating()
-        
-        Returns the average rating."""
-        if not (self.votes and self.score):
-            return 0
-        return float(self.score) / self.votes
+
+    def percent_rating(self):
+        return self.rating * 100
 
     def get_rating_for_user(self, user, ip_address=None, cookies=None):
         """get_rating_for_user(user, ip_address=None, cookie=None)
@@ -98,24 +75,28 @@ class RatingManager(object):
         except Vote.DoesNotExist:
             pass
         return
-    
+
     def add(self, score, user, ip_address, cookies=None, commit=True):
         """add(score, user, ip_address)
         
         Used to add a rating to an object."""
+        delete = False
         try:
-            score = int(score)
+            score = float(score)
         except (ValueError, TypeError):
-            raise InvalidRating("%s is not a valid choice for %s"
-                                "" % (score, self.field.name))
+            if score == '.':
+                delete = True
+            else:
+                raise InvalidRating("%s is not a valid choice for %s"
+                                    "" % (score, self.field.name))
 
-        delete = (score == 0)
         if delete and not self.field.allow_delete:
             raise CannotDeleteVote("you are not allowed to delete votes for %s"
                                    "" % (self.field.name,))
             # ... you're also can't delete your vote if you haven't permissions
             # to change it. I leave this case for CannotChangeVote
-        elif score not in self.field.range and not delete:
+        elif (score < self.field.range[0]
+              or score > self.field.range[1]) and not delete:
             raise InvalidRating("%s is not a valid choice for %s"
                                 "" % (score, self.field.name))
 
@@ -182,28 +163,20 @@ class RatingManager(object):
                     rating.save()
             else:
                 raise CannotChangeVote()
-        else:
+        else:  # if created
             has_changed = True
             self.votes += 1
 
         if has_changed:
             if not delete:
                 self.score += rating.score
+
+            difference = self.score / self.votes - self.rating.range[0]
+            max_difference = self.rating.range[1] - self.rating.range[0]
+            self.rating = difference / max_difference
+
             if commit:
                 self.instance.save()
-
-            defaults = dict(
-                score=self.score,
-                votes=self.votes,
-            )
-            
-            kwargs = self.default_kwargs.copy()
-
-            from .models import Score
-
-            if not Score.objects.filter(**kwargs).update(**defaults):
-                kwargs.update(defaults)
-                Score.objects.create(**kwargs)
 
         # return value
         result = {}
@@ -215,7 +188,7 @@ class RatingManager(object):
         return result
 
     def delete(self, user, ip_address, cookies=None, commit=True):
-        return self.add(0, user, ip_address, cookies, commit)
+        return self.add('.', user, ip_address, cookies, commit)
 
     @property
     def votes(self, default=None):
@@ -233,31 +206,25 @@ class RatingManager(object):
     def score(self, value):
         setattr(self.instance, self.score_field_name, value)
 
-    # def get_content_type(self):
-    #     if self.content_type is None:
-    #         self.content_type = ContentType.objects.get_for_model(self.instance)
-    #     return self.content_type
-    
+    @property
+    def rating(self, default=None):
+        return getattr(self.instance, self.rating_field_name, default)
+
+    @rating.setter
+    def rating(self, value):
+        setattr(self.instance, self.rating_field_name, value)
+
     def _update(self, commit=False):
         """Forces an update of this rating
         (useful for when Vote objects are removed).
         """
-        from .models import Vote, Score
+        from .models import Vote
 
         kwargs = self.default_kwargs.copy()
         votes = Vote.objects.filter(**kwargs).aggregate(
             Sum('score'), Count('score'))
         self.score = votes['score__sum']
         self.votes = votes['score__count']
-
-        defaults = dict(
-            score=self.score,
-            votes=self.votes,
-        )
-
-        if not Score.objects.filter(**kwargs).update(**defaults):
-            kwargs.update(defaults)
-            Score.objects.create(**kwargs)
 
         if commit:
             self.instance.save()
@@ -283,21 +250,13 @@ class RatingCreator(object):
                 self.field.name, value))
 
 
-class RatingField(IntegerField):
+class RatingField(FloatField):
     """
     A rating field contributes two columns to the model instead of the standard
      single column.
     """
     def __init__(self, *args, **kwargs):
-        if kwargs.get('choices'):
-            self.range = [k for k, v in kwargs['choices']]
-        elif kwargs.get('range'):
-            self.range = kwargs.pop('range', range(1, 2))
-            kwargs['choices'] = [(i, i) for i in self.range]
-        else:
-            raise ImproperlyConfigured(
-                "{0} imporoperly configured: attribute 'choices' or 'range' "
-                "needed".format(self.__class__.__name__,))
+        self.range = kwargs.pop('range')
         self.can_change_vote = kwargs.pop('can_change_vote', False)
         self.allow_anonymous = kwargs.pop('allow_anonymous', False)
         self.use_cookies = kwargs.pop('use_cookies', False)
@@ -308,6 +267,7 @@ class RatingField(IntegerField):
         self.key = None
         self.votes_field = None
         self.score_field = None
+        self.rating_field = None
         super(RatingField, self).__init__(*args, **kwargs)
     
     def contribute_to_class(self, cls, name, virtual_only=False):
@@ -317,43 +277,24 @@ class RatingField(IntegerField):
         self.votes_field = PositiveIntegerField(
             editable=False, default=0, blank=True)
         cls.add_to_class("%s_votes" % (self.name,), self.votes_field)
-
         # Score sum field
-        self.score_field = IntegerField(
+        self.score_field = FloatField(
             editable=False, default=0, blank=True)
         cls.add_to_class("%s_score" % (self.name,), self.score_field)
+        # rating field
+        self.rating_field = FloatField(
+            editable=False, default=0, blank=True)
+        cls.add_to_class("%s_rating" % (self.name,), self.rating_field)
 
         cls._meta.add_virtual_field(self)
-
-        self.key = md5_hexdigest(self.name)
-
+        self.key = md5(self.name.encode('utf-8')).hexdigest()
         field = RatingCreator(self)
         setattr(cls, name, field)
-
-    # def get_db_prep_save(self, value, connection):
-    #     pass
-    #
-    # def get_db_prep_lookup(self, lookup_type, value):
-    #     # TODO: hack in support for __score and __votes
-    #     # TODO: order_by on this field should use the weighted algorithm
-    #     raise NotImplementedError(self.get_db_prep_lookup)
-    #     # if lookup_type in ('score', 'votes'):
-    #     #     lookup_type =
-    #     #     return self.score_field.get_db_prep_lookup()
-    #     if lookup_type == 'exact':
-    #         return [self.get_db_prep_save(value)]
-    #     elif lookup_type == 'in':
-    #         return [self.get_db_prep_save(v) for v in value]
-    #     else:
-    #         return super(RatingField, self).get_db_prep_lookup(
-    #             lookup_type, value)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': ChoiceField}
         defaults.update(kwargs)
         return super(RatingField, self).formfield(**defaults)
-
-    # TODO: flatten_data method
 
 
 class AnonymousRatingField(RatingField):

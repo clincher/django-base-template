@@ -1,0 +1,9 @@
+{% extends "site_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Thanks for commenting" %}.{% endblock %}
+
+{% block body_base %}
+  <p class="breadcrumbs"><a href="{% url 'home' %}">Главная</a> Комментарий опубликован</p>
+  <h1>{% trans "Thank you for your comment" %}.</h1>
+{% endblock %}

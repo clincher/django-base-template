@@ -1,0 +1,59 @@
+
+.content ul {
+    list-style: disc inside;
+}
+
+.content ol {
+    list-style: decimal inside;
+}
+.content ul ul,
+.content  ol ul {
+   list-style: circle inside;
+   margin-left: 15px;
+}
+.content ol ol,
+.content  ul ol {
+   list-style: lower-latin inside;
+   margin-left: 15px;
+}
+
+.content b,
+.content strong {
+    font-weight: bold;
+}
+
+.content i {
+    font-style: italic;
+}
+
+.content h1 {
+    font-size: 1.75em;
+    font-weight: bold;
+}
+
+.content h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.content h3 {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+.content h4 {
+    color: #222;
+    font-family: pt_sansbold;
+    font-size: 20px;
+    line-height: 25px;
+    margin-bottom: 3px;
+}
+
+.content h5 {
+    font-weight: bold;
+}
+
+.content h6 {
+    font-weight: bold;
+    font-style: italic;
+}

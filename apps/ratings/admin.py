@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Vote, Score
+from .models import Vote
 
 
 class VoteAdmin(admin.ModelAdmin):
@@ -11,9 +11,4 @@ class VoteAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
 
 
-class ScoreAdmin(admin.ModelAdmin):
-    list_display = ('content_object', 'score', 'votes')
-    list_filter = ('content_type',)
-
 admin.site.register(Vote, VoteAdmin)
-admin.site.register(Score, ScoreAdmin)
