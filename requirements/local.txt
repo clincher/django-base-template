@@ -6,9 +6,6 @@
 # Deployment
 Fabric
 
-# Documentation
-Sphinx
-
 # Testing
 nose
 mock

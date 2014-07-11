@@ -3,15 +3,18 @@
 
 # Django stuff
 Django
+django-extensions
+django-debug-toolbar
+ipython
 django-braces
 django-model-utils
-django-comments-xtd
+-e git+https://github.com/danirus/django-comments-xtd.git@3a1bf51cb8a7d687992c51ac4760ca7f21a79f7f#egg=django_comments_xtd
 django-grappelli
 django-ckeditor-updated
 -e git+https://github.com/mariocesar/sorl-thumbnail.git@v11.12.1b#egg=sorl-thumbnail
 django-mptt
 
-
+# Ucomment next lines for install django-cms
 #django-cms
 #django-filer
 #cmsplugin-filer
@@ -22,33 +25,10 @@ django-mptt
 
 # Templates
 django-appconf
-django_compressor
-
-# Security
-#bleach
-#cef
-
-# Logging
-#raven
-
-# Celery: Message queue
-#celery
-#django-celery
-
-# L10n/i18n
-#Babel
-#-e git://github.com/clouserw/tower.git#egg=tower
 
 # Caching
 django-pylibmc
 -e git+https://github.com/lericson/pylibmc.git@py3k#egg=pylibmc
 
-# Admin
-django-extensions
-django-debug-toolbar
-
 # Migrations
 South
-
-# Feature testing
-#django-waffle

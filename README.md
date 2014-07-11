@@ -5,35 +5,11 @@
 
 This template is based off of the work of [Mozilla Playdoh][playdoh] and
 [Two Scoops of Django][twoscoops], as well as experience with other Django
-layouts/project templates. Playdoh is mainly setup for Mozilla's systems and is
-overly-complicated for a simple project template. (Though it does provide some
-very good real-world use examples.)
+layouts/project templates.
 
-As much as I could, all the code has been updated to use the new suggested layout
-and functionality in Django 1.6.
-
-[playdoh]: https://github.com/mozilla/playdoh
-[twoscoops]: https://github.com/twoscoops/django-twoscoops-project
+This template should work with Django 1.6 and python 3.3+
 
 ## Features ##
-
-By default, this project template includes:
-
-A set of basic templates built from HTML5Boilerplate 4.1.0 and Twitter Bootstrap 3.0.2 (located in the
-base app, with css and javascript loaded from CloudFlare CDN by default).
-
-Templating:
-
-- django_compressor for compressing javascript/css/less/sass
-
-Security:
-
-- bleach
-- bcrypt - uses bcrypt for password hashing by default
-
-Background Tasks:
-
-- Celery
 
 Migrations:
 
@@ -41,7 +17,7 @@ Migrations:
 
 Caching:
 
-- python-memcached
+- pylibmc
 
 Admin:
 
@@ -75,7 +51,7 @@ Describe your project here.
 
 ## Prerequisites ##
 
-- Python 3.0+
+- Python 3.3+
 - pip
 - virtualenvwrapper
 

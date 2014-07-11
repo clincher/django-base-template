@@ -20,39 +20,31 @@
   <!--[if lt IE 7]>
     <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
   <![endif]-->
-<div class="{% block wrapper_class %}{% endblock %}">
-
-    {% block body_base %}
-        <section id="content_body">
-            <div class="container">
-                <h1 class="page-header">{% block title %}{% endblock %}</h1>
-                {% include "_messages.html" %}
-                {% block body %}
-                {% endblock %}
-            </div>
-        </section>
-    {% endblock %}}
-</div>
-
-{% block script_base %}
-    {% compressed_js 'main' %}
-    {% block extra_script %}{% endblock %}
-{% endblock %}
-
-{% block extra_body_base %}
-    {% block extra_body %}{% endblock %}
-{% endblock %}
+  <div class="{% block wrapper_class %}{% endblock %}">
+      {% block body_base %}
+          <section id="content_body">
+              <div class="container">
+                  <h1 class="page-header">{% block title %}{% endblock %}</h1>
+                  {% include "_messages.html" %}
+                  {% block body %}
+                  {% endblock %}
+              </div>
+          </section>
+      {% endblock %}}
+  </div>
+  {% block extra_body_base %}
+      {% block extra_body %}{% endblock %}
+  {% endblock %}
+  {% block extra_script %}{% endblock %}
   {% block cdn_js %}
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/libs/jquery-1.11.1.min.js"><\/script>')</script>
   {% endblock cdn_js %}
 
   <!-- scripts concatenated and minified via django-compressor -->
-  {% compress js %}
   {% block js %}
   <script src="{{ STATIC_URL }}'js/main.js'"></script>
   {% endblock js %}
-  {% endcompress %}
   <!-- end scripts -->
 
   <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

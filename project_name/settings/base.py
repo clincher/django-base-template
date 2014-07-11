@@ -5,7 +5,7 @@ repo. If you need to override a setting locally, use local.py
 
 import os
 import logging.config
-from os.path import abspath, basename, dirname, join, normpath
+from os.path import abspath, dirname, join, normpath
 
 # Normally you should not import ANYTHING from Django directly
 # into your settings, but ImproperlyConfigured is an exception.
@@ -29,11 +29,12 @@ SUPPORTED_NONLOCALES = ['media', 'admin', 'static']
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'en'
 
-LANGUAGES = (
-    ('ru', 'Russian'),
-)
+# LANGUAGES = (
+#     ('en', 'English'),
+#     ('ru', 'Russian'),
+# )
 
 # Defines the views served for root URLs.
 ROOT_URLCONF = '{{ project_name }}.urls'
@@ -267,21 +268,8 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '',
         'PORT': '',
-        #'OPTIONS': {
-        #    'init_command': 'SET storage_engine=InnoDB',
-        #    'charset' : 'utf8',
-        #    'use_unicode' : True,
-        #},
-        #'TEST_CHARSET': 'utf8',
-        #'TEST_COLLATION': 'utf8_general_ci',
     },
-    # 'slave': {
-    #     ...
-    # },
 }
-
-# Uncomment this and set to all slave DBs in use on the site.
-# SLAVE_DATABASES = ['slave']
 
 # Recipients of traceback emails and other notifications.
 ADMINS = (
@@ -294,10 +282,6 @@ MANAGERS = ADMINS
 # on all server instances and True only for development.
 DEBUG = TEMPLATE_DEBUG = True
 
-# Is this a development instance? Set this to True on development/master
-# instances and False on stage/prod.
-DEV = False
-
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -309,19 +293,9 @@ ALLOWED_HOSTS = []
 # This is good to use in production, and on services that support it such as Heroku.
 #SECRET_KEY = get_env_setting('SECRET_KEY')
 
-# Uncomment these to activate and customize Celery:
-# CELERY_ALWAYS_EAGER = False  # required to activate celeryd
-# BROKER_HOST = 'localhost'
-# BROKER_PORT = 5672
-# BROKER_USER = 'django'
-# BROKER_PASSWORD = 'django'
-# BROKER_VHOST = 'django'
-# CELERY_RESULT_BACKEND = 'amqp'
-
 INTERNAL_IPS = ('127.0.0.1')
 
 # Enable this option for memcached
-
 CACHES = {
     'default': {
         'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
@@ -340,11 +314,6 @@ DEFAULT_FROM_EMAIL = "webmaster@example.com"
 SYSTEM_EMAIL_PREFIX = "[{{ project_name }}]"
 
 ## Log settings
-
-LOG_LEVEL = logging.INFO
-HAS_SYSLOG = True
-SYSLOG_TAG = "http_app_{{ project_name }}"  # Make this unique to your project.
-# Remove this configuration variable to use your custom logging configuration
 LOGGING_CONFIG = None
 
 LOGGING = {
