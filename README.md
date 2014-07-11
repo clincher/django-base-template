@@ -36,7 +36,6 @@ Any of these options can added, modified, or removed as you like after creating 
 - pip3 install django
 - $ django-admin.py startproject --template https://github.com/clincher/django-base-template/zipball/master --extension py,md,rst project_name
 - $ cd project_name
-- Uncomment your preferred database adapter in requirements/compiled.txt (MySQL, Postgresql, or skip this step to stick with SQLite)
 - $ pip3 install -r requirements/local.txt
 - $ cp projectname/settings/local-dist.py projectname/settings/local.py
 - $ python manage.py syncdb --migrate
